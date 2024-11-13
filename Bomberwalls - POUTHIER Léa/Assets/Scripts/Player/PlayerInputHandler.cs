@@ -5,7 +5,6 @@ using UnityEngine.InputSystem;
 public class PlayerInputHandler : MonoBehaviour
 {
     public event Action<InputAction.CallbackContext, Vector2> OnMove;
-    public event Action<InputAction.CallbackContext> OnBombCollection;
     public event Action<InputAction.CallbackContext> OnBombActivation;
 
     private PlayerInput _player;
@@ -22,10 +21,6 @@ public class PlayerInputHandler : MonoBehaviour
         {
             case "Move":
                 OnMove?.Invoke(ctx, ctx.ReadValue<Vector2>());
-                break;
-
-            case "BombCollection":
-                OnBombCollection?.Invoke(ctx);
                 break;
 
             case "BombActivation":

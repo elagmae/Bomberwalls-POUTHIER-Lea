@@ -17,25 +17,11 @@ public class BombCollection : MonoBehaviour
     private void Awake()
     {
         _input = GetComponent<PlayerInputHandler>();
-        _input.OnBombCollection += BombCollector;
-    }
-
-    public void BombCollector(InputAction.CallbackContext ctx)
-    {
-        if (ctx.performed)
-        {
-            _collect = true;
-        }
-
-        else if (ctx.canceled)
-        {
-            _collect = false;
-        }
     }
 
     private void OnTriggerStay2D(Collider2D collision)
     {
-        if (collision.CompareTag("Bomb") && _collect && Inventory.Count < _maxinventorySlots)
+        if (collision.CompareTag("Bomb") && Inventory.Count < _maxinventorySlots)
         {
             collision.gameObject.SetActive(false);
             Inventory.Add(collision.gameObject);

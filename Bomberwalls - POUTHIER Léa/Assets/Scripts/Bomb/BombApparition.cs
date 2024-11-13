@@ -3,13 +3,15 @@ using UnityEngine;
 
 public class BombApparition : MonoBehaviour
 {
+    public List<GetNodeInfos> AllNodes { get; set; } = new List<GetNodeInfos>();
+
+    [SerializeField]
+    private GetUsedNode _playerPlacement;
+    private GameObject[] _allNodes;
+
     private List<Vector2> _placements = new List<Vector2>();
     [SerializeField]
     private GetUsedNode _iaPlacement;
-    [SerializeField]
-    private GetUsedNode _playerPlacement;
-
-    private GameObject[] _allNodes;
 
     private void Awake()
     {
@@ -55,5 +57,13 @@ public class BombApparition : MonoBehaviour
     private void OnDisable()
     {
         _placements.Clear();
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Ground"))
+        {
+            print(collision.gameObject.name);
+        }
     }
 }

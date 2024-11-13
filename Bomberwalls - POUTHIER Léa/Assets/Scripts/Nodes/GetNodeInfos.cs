@@ -4,6 +4,10 @@ using UnityEngine;
 public class GetNodeInfos : MonoBehaviour
 {
     public List<GetNodeInfos> Links { get; private set; } = new List<GetNodeInfos>();
+
+    [SerializeField]
+    private BombApparition _bombApparition;
+
     private List<Vector2> _directions;
 
     // Valeurs de chaque node qui contient ce script.
@@ -13,6 +17,8 @@ public class GetNodeInfos : MonoBehaviour
 
     private void Awake()
     {
+        _bombApparition.AllNodes.Add(this);
+
         // On prend chaque position voisine à l'objet.
         _directions = new List<Vector2>() {new Vector2(transform.position.x + 1.28f, transform.position.y), new Vector2(transform.position.x - 1.28f, transform.position.y), new Vector2(transform.position.x, transform.position.y + 1.28f), new Vector2(transform.position.x, transform.position.y - 1.28f) };
 

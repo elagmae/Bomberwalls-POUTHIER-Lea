@@ -2,10 +2,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PlayerInventoryUI : MonoBehaviour
+public class InventoryUI : MonoBehaviour
 {
-    [SerializeField]
-    private List<Image> _inventoryUI;
+    [field : SerializeField]
+    public List<GameObject> _inventoryUI {get;private set;}
     private BombCollection _bombCollection;
 
     private void Awake()
@@ -21,23 +21,23 @@ public class PlayerInventoryUI : MonoBehaviour
         {
             if (inventory.Count > i)
             {
-                _inventoryUI[i].gameObject.SetActive(true);
+                _inventoryUI[i].SetActive(true);
             }
 
             else
             {
-                _inventoryUI[i].gameObject.SetActive(false);
+                _inventoryUI[i].SetActive(false);
             }
         }
     }
 
     public void InventoryRemoveUI(List<GameObject> inventory)
     {
-        foreach (Image item in _inventoryUI)
+        foreach (GameObject item in _inventoryUI)
         {
-            if (item.gameObject.activeInHierarchy)
+            if (item.activeInHierarchy)
             {
-                item.gameObject.SetActive(false);
+                item.SetActive(false);
                 break;
             }
         }

@@ -1,97 +1,167 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public class AstarPattern : MonoBehaviour
 {
-    private GetNodeInfos _firstNode;
     [SerializeField]
+    private GetNodeInfos _wallNode;
+    private GameObject[] _bombs;
     private GetNodeInfos _finalNode;
-    [SerializeField]
     private GetNodeInfos _currentNode;
+
+    [SerializeField]
+    private GetNodeInfos _firstNode;
+    private BombApparition _bombApparition;
+    private InventoryUI _inventory;
+    private MoveIA _moveIA;
 
     private List<GetNodeInfos> _activePath = new List<GetNodeInfos>();
     private List<List<GetNodeInfos>> _closedPaths = new List<List<GetNodeInfos>>();
     private List<List<GetNodeInfos>> _tempClosedPaths = new List<List<GetNodeInfos>>();
 
+    private bool _pathFinished = true;
+    private bool _firstNodeGotten = false;
+
+    private GameObject _minObject;
+
     private void Awake()
     {
-        _firstNode = _currentNode;
-
-        _activePath.Add(_currentNode);
-        _closedPaths.Add(new List<GetNodeInfos>() { _currentNode });
+        _currentNode = _firstNode;
+        _bombApparition = ObjectPool.Instance.gameObject.GetComponent<BombApparition>();
+        _inventory = GetComponent<InventoryUI>();;
+        _moveIA = GetComponent<MoveIA>();
     }
 
-    private void Update()
+    private void Start()
     {
-        if(_finalNode != null && _currentNode != _finalNode)
-        {
-            print(GetPath().Count);
-        }
+        _currentNode = null;
+        _bombs = GameObject.FindGameObjectsWithTag("Bomb");
 
-        else
+        if (_pathFinished)
         {
-            foreach (GetNodeInfos info in _activePath)
+            _currentNode = null;
+            if (_inventory._inventoryUI.FindAll((g) => g.activeInHierarchy).Count == 0 && _finalNode == null && !_firstNodeGotten)
             {
-                print("fin");
-                Debug.Log(info.gameObject.name);
+                _firstNodeGotten = true;
+                _finalNode = GetClosestBomb();
+                StartAstar();
+            }
+
+            else if(_finalNode == null && _inventory._inventoryUI.FindAll((g) => g.activeInHierarchy).Count > 0 && !_firstNodeGotten)
+            {
+                _firstNodeGotten = true;
+                _finalNode = _wallNode;
+                StartAstar();
             }
         }
     }
 
-    public List<GetNodeInfos> ChooseShortest(List<List<GetNodeInfos>> closedPath)
+    public void StartAstar()
     {
-        List<GetNodeInfos> minList = _activePath.ToList();
+        _pathFinished = false;
 
+        //_activePath.Clear();
+        //_closedPaths.Clear();
+        //_tempClosedPaths.Clear();
+
+        _activePath.Add(_currentNode);
+
+        while (_currentNode != null && _currentNode != _finalNode)
+        {
+            print(_currentNode.gameObject.name);
+            ChooseShortest();
+            GetClosestLink();
+        }
+
+        if (_currentNode == _finalNode)
+        {
+            _finalNode = null;
+            StartCoroutine(_moveIA.MoveToNode(_activePath));
+        }
+    }
+
+    public GetNodeInfos GetClosestBomb()
+    {
+        if (_bombs.Length != 0)
+        {
+            _minObject = _bombs[0];
+            foreach (var bomb in _bombs)
+            {
+                if (((bomb.transform.position) - this.transform.position).magnitude <= ((_minObject.transform.position) - this.transform.position).magnitude)
+                {
+                    _minObject = bomb;
+                }
+            }
+
+            foreach (var node in _bombApparition.AllNodes)
+            {
+                if (_minObject.transform.position == node.gameObject.transform.position)
+                {
+                    return node;
+                }
+            }
+
+            return GetClosestBomb();
+        }
+
+        return GetClosestBomb();
+
+    }
+
+    public List<GetNodeInfos> ChooseShortest()
+    {
+        List<GetNodeInfos> minList = new(_activePath);
+
+        List<List<GetNodeInfos>> closedPath = new(_closedPaths);
         foreach (List<GetNodeInfos> path in closedPath)
         {
             if (GetF(path[^1]) < GetF(minList[^1]))
             {
-                minList = path.ToList();
+                minList = new(path);
             }
         }
 
-        _activePath = minList.ToList();
-        _currentNode = _activePath.ToList()[^1];
-        print(_currentNode.gameObject.name);
+        _activePath = new(minList);
+
+        if (_closedPaths.Contains(_activePath))
+        {
+            _closedPaths.Remove(_activePath);
+        }
 
         return _activePath;
     }
 
-    public List<GetNodeInfos> GetPath()
+    public List<GetNodeInfos> GetClosestLink()
     {
-        _tempClosedPaths = _closedPaths.ToList();
-        foreach (List<GetNodeInfos> path in _closedPaths.ToList())
+        List<GetNodeInfos> minLinkList = new() { _activePath[^1].Links[0] };
+
+        foreach (GetNodeInfos link in _activePath[^1].Links)
         {
-            if (path[^1] == _currentNode)
+            if (_activePath.Contains(link)) continue;
+
+            else if (GetF(link) < GetF(minLinkList[0]))
             {
-                foreach (GetNodeInfos link in _currentNode.Links)
-                {
-                    List<GetNodeInfos> potentialPath = path.ToList();
-                    _tempClosedPaths.Remove(path);
+                minLinkList.Clear();
+                minLinkList.Add(link);
+            }
 
-                    if (!potentialPath.Contains(link))
-                    {
-                        potentialPath.Add(link);
-                        _activePath = potentialPath.ToList();
-                    }
-
-                    else
-                    {
-                        _activePath.Remove(link);
-                    }
-
-                    _tempClosedPaths.Add(potentialPath.ToList());
-                    potentialPath.Clear();
-                }
-
-                break;
+            else if(GetF(link) == GetF(minLinkList[0]) && !minLinkList.Contains(link))
+            {
+                minLinkList.Add(link);
             }
         }
 
-        _closedPaths = _tempClosedPaths;
+        for(int i = 1; i < minLinkList.Count; i++)
+        {
+            List<GetNodeInfos> tempActive = new(_activePath);
+            tempActive.Add(minLinkList[i]);
+            _closedPaths.Add(tempActive);
+        }
 
-        return ChooseShortest(_closedPaths);
+        _activePath.Add(minLinkList[0]);
+        _currentNode = _activePath[^1];
+
+        return minLinkList;
     }
 
     // Valeurs calculées de chaque node.
@@ -103,7 +173,7 @@ public class AstarPattern : MonoBehaviour
 
     public float GetG(GetNodeInfos node)
     {
-        node.G = (_firstNode.transform.position - node.transform.position).magnitude;
+        node.G = (_activePath.Count + 1);
         return node.G;
     }
 

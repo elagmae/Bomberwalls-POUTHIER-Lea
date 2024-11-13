@@ -15,15 +15,6 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "BombCollection",
-                    "type": "Button",
-                    "id": "1a246671-b3a4-4e9f-bc4e-70115d3c06cd",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
                     "name": "BombActivation",
                     "type": "Button",
                     "id": "af939922-b662-48ef-9e51-91b82d17e3c6",
@@ -143,17 +134,6 @@
                     "action": "Move",
                     "isComposite": false,
                     "isPartOfComposite": true
-                },
-                {
-                    "name": "",
-                    "id": "68dd75c3-b3af-4ba8-985a-5dae6fe6d27b",
-                    "path": "<Keyboard>/e",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "BombCollection",
-                    "isComposite": false,
-                    "isPartOfComposite": false
                 },
                 {
                     "name": "",

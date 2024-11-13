@@ -10,7 +10,7 @@ public class ObjectPool : MonoBehaviour
     [field : SerializeField]
     public int AmountToPool {get;private set;}
 
-    private List<GameObject> _pooledObjects;
+    public List<GameObject> PooledObjects { get; private set; }
 
     void Awake()
     {
@@ -25,7 +25,7 @@ public class ObjectPool : MonoBehaviour
             Instance = this;
         }
 
-        _pooledObjects = new List<GameObject>();
+        PooledObjects = new List<GameObject>();
         GameObject temp;
 
         for (int i = 0; i < AmountToPool; i++)
@@ -35,18 +35,27 @@ public class ObjectPool : MonoBehaviour
             temp.SetActive(false);
 
             temp.name = $"{_objectToPool.name}";
-            _pooledObjects.Add(temp);
+            PooledObjects.Add(temp);
         }
+    }
+
+    public List<GameObject> GetAllObjects()
+    {
+        for(int i = 0; i <= AmountToPool; i++)
+        {
+
+        }
+        return PooledObjects;
     }
 
     public GameObject GetPooledObject()
     {
         for (int i = 0; i < AmountToPool; i++)
         {
-            if (!_pooledObjects[i].activeInHierarchy)
+            if (!PooledObjects[i].activeInHierarchy)
             {
-                var obj = _pooledObjects[i];
-                _pooledObjects.Remove(obj);
+                var obj = PooledObjects[i];
+                PooledObjects.Remove(obj);
                 return obj;
             }
         }
@@ -55,7 +64,7 @@ public class ObjectPool : MonoBehaviour
 
     public void AddPoolObjectBack(GameObject pooledObject)
     {
-        _pooledObjects.Add(pooledObject);
+        PooledObjects.Add(pooledObject);
     }
 }
 
