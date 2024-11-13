@@ -1,74 +1,84 @@
 using System.Collections.Generic;
+using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class AstarPattern : MonoBehaviour
 {
     [SerializeField]
     private GetNodeInfos _wallNode;
-    private GameObject[] _bombs;
+    public GameObject[] Bombs {get; private set;}
     private GetNodeInfos _finalNode;
     private GetNodeInfos _currentNode;
+    private GetUsedNode _usedNode;
 
     [SerializeField]
     private GetNodeInfos _firstNode;
     private BombApparition _bombApparition;
-    private InventoryUI _inventory;
+    public InventoryUI Inventory { get; private set; }
     private MoveIA _moveIA;
 
     private List<GetNodeInfos> _activePath = new List<GetNodeInfos>();
     private List<List<GetNodeInfos>> _closedPaths = new List<List<GetNodeInfos>>();
     private List<List<GetNodeInfos>> _tempClosedPaths = new List<List<GetNodeInfos>>();
 
-    private bool _pathFinished = true;
-    private bool _firstNodeGotten = false;
+    public bool PathFinished { get; set; } = true;
+    public bool FirstNodeGoten { get; set; } = false;
 
-    private GameObject _minObject;
+    public GameObject MinObject { get; set; } = null;
+    public GameObject CurrentBomb { get; set; } = null;
 
     private void Awake()
     {
         _currentNode = _firstNode;
+        _usedNode = GetComponent<GetUsedNode>();
         _bombApparition = ObjectPool.Instance.gameObject.GetComponent<BombApparition>();
-        _inventory = GetComponent<InventoryUI>();;
+        Inventory = GetComponent<InventoryUI>();
         _moveIA = GetComponent<MoveIA>();
     }
 
     private void Start()
     {
-        _currentNode = null;
-        _bombs = GameObject.FindGameObjectsWithTag("Bomb");
+        _currentNode = _firstNode;
+        Bombs = GameObject.FindGameObjectsWithTag("Bomb");
+    }
 
-        if (_pathFinished)
+    private void Update()
+    {
+        if (PathFinished)
         {
-            _currentNode = null;
-            if (_inventory._inventoryUI.FindAll((g) => g.activeInHierarchy).Count == 0 && _finalNode == null && !_firstNodeGotten)
+            _currentNode = _usedNode.UsedNode.GetComponent<GetNodeInfos>();
+
+            if (Inventory._inventoryUI.FindAll((g) => g.activeInHierarchy).Count == 0 && !FirstNodeGoten)
             {
-                _firstNodeGotten = true;
+                if (!Bombs.Any((b) => b.activeInHierarchy == true && b.tag == "Bomb")) return;
+
+                FirstNodeGoten = true;
                 _finalNode = GetClosestBomb();
                 StartAstar();
             }
 
-            else if(_finalNode == null && _inventory._inventoryUI.FindAll((g) => g.activeInHierarchy).Count > 0 && !_firstNodeGotten)
+            else if(Inventory._inventoryUI.FindAll((g) => g.activeInHierarchy).Count > 0 && !FirstNodeGoten)
             {
-                _firstNodeGotten = true;
+                FirstNodeGoten = true;
                 _finalNode = _wallNode;
                 StartAstar();
             }
+
+            PathFinished = false;
         }
     }
 
     public void StartAstar()
     {
-        _pathFinished = false;
-
-        //_activePath.Clear();
-        //_closedPaths.Clear();
-        //_tempClosedPaths.Clear();
+        _activePath.Clear();
+        _closedPaths.Clear();
+        _tempClosedPaths.Clear();
 
         _activePath.Add(_currentNode);
 
         while (_currentNode != null && _currentNode != _finalNode)
         {
-            print(_currentNode.gameObject.name);
             ChooseShortest();
             GetClosestLink();
         }
@@ -82,21 +92,32 @@ public class AstarPattern : MonoBehaviour
 
     public GetNodeInfos GetClosestBomb()
     {
-        if (_bombs.Length != 0)
+        List<GameObject> bombs = new List<GameObject>();
+
+        foreach (GameObject bomb in Bombs)
         {
-            _minObject = _bombs[0];
-            foreach (var bomb in _bombs)
+            if(bomb.activeInHierarchy && bomb.tag == "Bomb")
             {
-                if (((bomb.transform.position) - this.transform.position).magnitude <= ((_minObject.transform.position) - this.transform.position).magnitude)
+                bombs.Add(bomb);
+            }
+        }
+
+        if (bombs.Count != 0)
+        {
+            MinObject = bombs[0];
+            foreach (var bomb in bombs)
+            {
+                if (((bomb.transform.position) - this.transform.position).magnitude <= ((MinObject.transform.position) - this.transform.position).magnitude)
                 {
-                    _minObject = bomb;
+                    MinObject = bomb;
                 }
             }
 
             foreach (var node in _bombApparition.AllNodes)
             {
-                if (_minObject.transform.position == node.gameObject.transform.position)
+                if (MinObject.transform.position == node.gameObject.transform.position)
                 {
+                    CurrentBomb = MinObject;
                     return node;
                 }
             }
@@ -104,8 +125,7 @@ public class AstarPattern : MonoBehaviour
             return GetClosestBomb();
         }
 
-        return GetClosestBomb();
-
+        return null;
     }
 
     public List<GetNodeInfos> ChooseShortest()

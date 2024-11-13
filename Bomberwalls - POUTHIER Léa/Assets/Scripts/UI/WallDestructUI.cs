@@ -5,7 +5,7 @@ using UnityEngine.UI;
 public class WallDestructUI : MonoBehaviour
 {
     [SerializeField]
-    private BombActivation _bombActivation;
+    private BombExplosion _bombExplosion;
     [SerializeField]
     private GameObject _goSliderPV;
     [SerializeField]
@@ -16,11 +16,12 @@ public class WallDestructUI : MonoBehaviour
     private void Awake()
     {
         _sliderPV = _goSliderPV.GetComponent<Slider>();
-        _bombActivation.OnWallTouched += RemoveWallPV;
+        _bombExplosion.OnWallTouched += RemoveWallPV;
     }
 
     public void RemoveWallPV(string wallName)
     {
+        print(wallName + "ça remove là");
         if (wallName == this.gameObject.name && _sliderPV.value != 0)
         {
             _sliderPV.value--;

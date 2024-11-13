@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class MoveIA : MonoBehaviour
@@ -28,12 +29,13 @@ public class MoveIA : MonoBehaviour
                 _rb.velocity = velocity * _speed;
                 distance = (node.transform.position - this.transform.position).magnitude;
                 yield return new WaitForEndOfFrame();
+
+                if ((!(_astar.Bombs.Any((b) => b.activeInHierarchy == true && b.tag == "Bomb"))) && _astar.Inventory._inventoryUI.FindAll((g) => g.activeInHierarchy).Count == 0) break;
             }
         }
 
-        if (finalPath[^1].transform.position.magnitude >= this.transform.position.magnitude)
-        {
-            _rb.velocity = Vector3.zero;
-        }
+        _astar.PathFinished = true;
+        _astar.FirstNodeGoten = false;
+        _rb.velocity = Vector2.zero;
     }
 }

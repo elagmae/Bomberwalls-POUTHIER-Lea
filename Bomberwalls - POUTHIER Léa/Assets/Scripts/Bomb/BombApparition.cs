@@ -58,12 +58,4 @@ public class BombApparition : MonoBehaviour
     {
         _placements.Clear();
     }
-
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (collision.CompareTag("Ground"))
-        {
-            print(collision.gameObject.name);
-        }
-    }
 }
