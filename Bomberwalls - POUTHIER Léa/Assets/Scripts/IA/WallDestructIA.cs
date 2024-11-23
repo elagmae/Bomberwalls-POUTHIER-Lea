@@ -16,7 +16,7 @@ public class WallDestructIA : MonoBehaviour
         _explosion = GetComponent<BombExplosion>();
     }
 
-    private async void OnTriggerEnter2D(Collider2D collision)
+    private void OnTriggerEnter2D(Collider2D collision)
     {  
         if (collision.gameObject == _wallNode && _astar.Inventory._inventoryUI.FindAll((g) => g.activeInHierarchy).Count > 0)
         {

@@ -19,7 +19,6 @@ public class BombExplosion : MonoBehaviour
         bomb.transform.position = this.gameObject.transform.position;
         bomb.SetActive(true);
         _collection.RemoveObject();
-        print("là on est dans la coroutine stv");
 
         yield return new WaitForSeconds(3f);
 
@@ -36,7 +35,6 @@ public class BombExplosion : MonoBehaviour
             if (collider.CompareTag("BreakableWall"))
             {
                 OnWallTouched?.Invoke(collider.gameObject.name);
-                print(collider.gameObject.name);
             }
         }
     }

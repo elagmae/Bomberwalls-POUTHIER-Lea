@@ -21,7 +21,6 @@ public class WallDestructUI : MonoBehaviour
 
     public void RemoveWallPV(string wallName)
     {
-        print(wallName + "ça remove là");
         if (wallName == this.gameObject.name && _sliderPV.value != 0)
         {
             _sliderPV.value--;

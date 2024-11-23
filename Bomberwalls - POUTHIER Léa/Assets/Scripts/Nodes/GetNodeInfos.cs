@@ -28,7 +28,7 @@ public class GetNodeInfos : MonoBehaviour
             RaycastHit2D ray = Physics2D.Raycast(dir, dir );
             if(ray && ray.transform.gameObject.CompareTag("Ground"))
             {
-                Debug.DrawLine(dir, transform.position, Color.blue, 20f);
+                Debug.DrawLine(dir, transform.position, Color.magenta, 10f);
 
                 // S'il est présent et qu'il possède bien le cript attendu, on l'ajoute à la liste des voisins.
                 if(ray.transform.gameObject.GetComponent<GetNodeInfos>() != null)
