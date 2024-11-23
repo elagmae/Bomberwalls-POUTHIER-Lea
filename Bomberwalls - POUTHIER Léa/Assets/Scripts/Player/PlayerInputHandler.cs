@@ -4,6 +4,7 @@ using UnityEngine.InputSystem;
 
 public class PlayerInputHandler : MonoBehaviour
 {
+    //Event permettant d'appeler une méthode via une action donnée (ici les inputs du joueur).
     public event Action<InputAction.CallbackContext, Vector2> OnMove;
     public event Action<InputAction.CallbackContext> OnBombActivation;
 
@@ -15,6 +16,7 @@ public class PlayerInputHandler : MonoBehaviour
         _player.onActionTriggered += OnInput;
     }
 
+    // Fonction reliant les events aux méthodes directement par les inputs.
     public void OnInput(InputAction.CallbackContext ctx)
     {
         switch (ctx.action.name)

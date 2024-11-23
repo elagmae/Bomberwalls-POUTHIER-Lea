@@ -3,14 +3,16 @@ using UnityEngine;
 
 public class ObjectPool : MonoBehaviour
 {
+    [field: SerializeField]
+    public int AmountToPool { get; private set; }
     public static ObjectPool Instance { get; set; }
+    public List<GameObject> PooledObjects { get; private set; } = new();
+    public List<GameObject> ActivatedObjects { get; private set; } = new();
 
     [SerializeField]
     private GameObject _objectToPool;
-    [field : SerializeField]
-    public int AmountToPool {get;private set;}
 
-    public List<GameObject> PooledObjects { get; private set; }
+    // Création d'une object pool en singleton.
 
     void Awake()
     {
@@ -25,7 +27,6 @@ public class ObjectPool : MonoBehaviour
             Instance = this;
         }
 
-        PooledObjects = new List<GameObject>();
         GameObject temp;
 
         for (int i = 0; i < AmountToPool; i++)
@@ -34,20 +35,12 @@ public class ObjectPool : MonoBehaviour
             temp.transform.rotation = _objectToPool.transform.rotation;
             temp.SetActive(false);
 
-            temp.name = $"{_objectToPool.name}";
+            temp.name = $"{_objectToPool.name} {i+1}";
             PooledObjects.Add(temp);
         }
     }
 
-    public List<GameObject> GetAllObjects()
-    {
-        for(int i = 0; i <= AmountToPool; i++)
-        {
-
-        }
-        return PooledObjects;
-    }
-
+    //Récupère un objet de la pool.
     public GameObject GetPooledObject()
     {
         for (int i = 0; i < AmountToPool; i++)
@@ -55,16 +48,21 @@ public class ObjectPool : MonoBehaviour
             if (!PooledObjects[i].activeInHierarchy)
             {
                 var obj = PooledObjects[i];
+                obj.SetActive(true);
                 PooledObjects.Remove(obj);
+                ActivatedObjects.Add(obj);
                 return obj;
             }
         }
         return null;
     }
 
+    // Replace un objet à l'intérieur de la pool.
     public void AddPoolObjectBack(GameObject pooledObject)
     {
         PooledObjects.Add(pooledObject);
+        ActivatedObjects.Remove(pooledObject);
+        pooledObject.SetActive(false);
     }
 }
 

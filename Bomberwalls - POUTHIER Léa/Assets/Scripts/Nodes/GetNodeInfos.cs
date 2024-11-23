@@ -6,7 +6,7 @@ public class GetNodeInfos : MonoBehaviour
     public List<GetNodeInfos> Links { get; private set; } = new List<GetNodeInfos>();
 
     [SerializeField]
-    private BombApparition _bombApparition;
+    private BombPlacement _bombApparition;
 
     private List<Vector2> _directions;
 

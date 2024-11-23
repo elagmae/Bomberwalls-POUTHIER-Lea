@@ -1,23 +1,28 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 public class GetUsedNode : MonoBehaviour
 {
     [SerializeField]
-    private GameObject _beginningNode;
-    public GameObject UsedNode {get;private set;}
+    private GetNodeInfos _beginningNode;
+    private BombPlacement _placement;
+    public GetNodeInfos UsedNode {get;private set;}
 
-    private void Awake()
+    private void Start()
     {
-        transform.position = _beginningNode.transform.position;
+        _placement = ObjectPool.Instance.GetComponent<BombPlacement>();
+
         UsedNode = _beginningNode;
+        this.gameObject.transform.position = UsedNode.gameObject.transform.position;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.CompareTag("Ground"))
+        foreach(var node in _placement.AllNodes)
         {
-            UsedNode = collision.gameObject;
+            if (node.gameObject == collision.gameObject)
+            {
+                UsedNode = node;
+            }
         }
     }
 }

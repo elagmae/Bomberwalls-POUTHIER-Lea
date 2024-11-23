@@ -9,11 +9,13 @@ public class MoveIA : MonoBehaviour
     private float _speed;
     private Rigidbody2D _rb;
     private AstarPattern _astar;
+    private ChooseBomb _chooseBomb;
 
     private void Awake()
     {
         _rb = GetComponent<Rigidbody2D>();
         _astar = GetComponent<AstarPattern>();
+        _chooseBomb = GetComponent<ChooseBomb>();
     }
 
     public IEnumerator MoveToNode(List<GetNodeInfos> finalPath)
@@ -30,7 +32,7 @@ public class MoveIA : MonoBehaviour
                 distance = (node.transform.position - this.transform.position).magnitude;
                 yield return new WaitForEndOfFrame();
 
-                if ((!(_astar.Bombs.Any((b) => b.activeInHierarchy == true && b.tag == "Bomb"))) && _astar.Inventory._inventoryUI.FindAll((g) => g.activeInHierarchy).Count == 0) break;
+                if ((!(_chooseBomb.Bombs.Any((b) => b.activeInHierarchy == true && b.CompareTag("Bomb")))) && _astar.Inventory._inventoryUI.FindAll((g) => g.activeInHierarchy).Count == 0) break;
             }
         }
 

@@ -22,11 +22,13 @@ public class PlayerMove : MonoBehaviour
 
     private void FixedUpdate()
     {
+        //Modifie la vélocité du joueur par rapport à ses inputs.
         _rb.velocity = _direction * _speed;
     }
 
     public void Move(InputAction.CallbackContext ctx, Vector2 dir)
     {
+        // Vérifie la valeur des inputs de déplacement du joueur pour que celui-ci ne puisse pas se déplacer en diagonnal.
         _verticalMoving = dir.y != 0;
 
         if (_verticalMoving)

@@ -4,56 +4,54 @@ using UnityEngine;
 
 public class AstarPattern : MonoBehaviour
 {
-    [SerializeField]
-    private GetNodeInfos _wallNode;
-    public GameObject[] Bombs {get; private set;}
-    private GetNodeInfos _finalNode;
-    private GetNodeInfos _currentNode;
-    private GetUsedNode _usedNode;
+    public bool PathFinished { get; set; } = true;
+    public bool FirstNodeGoten { get; set; } = false;
+    public InventoryUI Inventory { get; private set; }
 
     [SerializeField]
     private GetNodeInfos _firstNode;
-    private BombApparition _bombApparition;
-    public InventoryUI Inventory { get; private set; }
+    [SerializeField]
+    private GetNodeInfos _wallNode;
+
+    private readonly List<List<GetNodeInfos>> _closedPaths = new();
+    private readonly List<List<GetNodeInfos>> _tempClosedPaths = new();
+    private readonly List<GetNodeInfos> _activePath = new();
+    private GetNodeInfos _finalNode;
+    private GetNodeInfos _currentNode;
+    private GetUsedNode _usedNode;
+    private ChooseBomb _chooseBomb;
+    private ChooseShortestPath _choosePath;
     private MoveIA _moveIA;
-
-    private List<GetNodeInfos> _activePath = new List<GetNodeInfos>();
-    private List<List<GetNodeInfos>> _closedPaths = new List<List<GetNodeInfos>>();
-    private List<List<GetNodeInfos>> _tempClosedPaths = new List<List<GetNodeInfos>>();
-
-    public bool PathFinished { get; set; } = true;
-    public bool FirstNodeGoten { get; set; } = false;
-
-    public GameObject MinObject { get; set; } = null;
-    public GameObject CurrentBomb { get; set; } = null;
+    private NodeDistance _nodeDistance;
 
     private void Awake()
     {
         _currentNode = _firstNode;
         _usedNode = GetComponent<GetUsedNode>();
-        _bombApparition = ObjectPool.Instance.gameObject.GetComponent<BombApparition>();
         Inventory = GetComponent<InventoryUI>();
+        _chooseBomb = GetComponent<ChooseBomb>();
+        _nodeDistance = GetComponent<NodeDistance>();
+        _choosePath = GetComponent<ChooseShortestPath>();
         _moveIA = GetComponent<MoveIA>();
     }
 
     private void Start()
     {
         _currentNode = _firstNode;
-        Bombs = GameObject.FindGameObjectsWithTag("Bomb");
     }
 
     private void Update()
     {
         if (PathFinished)
         {
-            _currentNode = _usedNode.UsedNode.GetComponent<GetNodeInfos>();
+            _currentNode = _usedNode.UsedNode;
 
             if (Inventory._inventoryUI.FindAll((g) => g.activeInHierarchy).Count == 0 && !FirstNodeGoten)
             {
-                if (!Bombs.Any((b) => b.activeInHierarchy == true && b.tag == "Bomb")) return;
+                if (!_chooseBomb.Bombs.Any((b) => b.activeInHierarchy == true && b.CompareTag("Bomb"))) return;
 
                 FirstNodeGoten = true;
-                _finalNode = GetClosestBomb();
+                _finalNode = _chooseBomb.GetClosestBomb();
                 StartAstar();
             }
 
@@ -78,7 +76,7 @@ public class AstarPattern : MonoBehaviour
 
         while (_currentNode != null && _currentNode != _finalNode)
         {
-            ChooseShortest();
+            _choosePath.ChooseShortest(_activePath,  _nodeDistance, _closedPaths, _finalNode);
             GetClosestLink();
         }
 
@@ -89,66 +87,6 @@ public class AstarPattern : MonoBehaviour
         }
     }
 
-    public GetNodeInfos GetClosestBomb()
-    {
-        List<GameObject> bombs = new List<GameObject>();
-
-        foreach (GameObject bomb in Bombs)
-        {
-            if(bomb.activeInHierarchy && bomb.tag == "Bomb")
-            {
-                bombs.Add(bomb);
-            }
-        }
-
-        if (bombs.Count != 0)
-        {
-            MinObject = bombs[0];
-            foreach (var bomb in bombs)
-            {
-                if (((bomb.transform.position) - this.transform.position).magnitude <= ((MinObject.transform.position) - this.transform.position).magnitude)
-                {
-                    MinObject = bomb;
-                }
-            }
-
-            foreach (var node in _bombApparition.AllNodes)
-            {
-                if (MinObject.transform.position == node.gameObject.transform.position)
-                {
-                    CurrentBomb = MinObject;
-                    return node;
-                }
-            }
-
-            return GetClosestBomb();
-        }
-
-        return null;
-    }
-
-    public List<GetNodeInfos> ChooseShortest()
-    {
-        List<GetNodeInfos> minList = new(_activePath);
-
-        List<List<GetNodeInfos>> closedPath = new(_closedPaths);
-        foreach (List<GetNodeInfos> path in closedPath)
-        {
-            if (GetF(path[^1]) < GetF(minList[^1]))
-            {
-                minList = new(path);
-            }
-        }
-
-        _activePath = new(minList);
-
-        if (_closedPaths.Contains(_activePath))
-        {
-            _closedPaths.Remove(_activePath);
-        }
-
-        return _activePath;
-    }
 
     public List<GetNodeInfos> GetClosestLink()
     {
@@ -158,13 +96,13 @@ public class AstarPattern : MonoBehaviour
         {
             if (_activePath.Contains(link)) continue;
 
-            else if (GetF(link) < GetF(minLinkList[0]))
+            else if (_nodeDistance.GetF(link, _finalNode.gameObject, _activePath) < _nodeDistance.GetF(minLinkList[0], _finalNode.gameObject, _activePath))
             {
                 minLinkList.Clear();
                 minLinkList.Add(link);
             }
 
-            else if(GetF(link) == GetF(minLinkList[0]) && !minLinkList.Contains(link))
+            else if(_nodeDistance.GetF(link, _finalNode.gameObject, _activePath) == _nodeDistance.GetF(minLinkList[0], _finalNode.gameObject, _activePath) && !minLinkList.Contains(link))
             {
                 minLinkList.Add(link);
             }
@@ -172,8 +110,10 @@ public class AstarPattern : MonoBehaviour
 
         for(int i = 1; i < minLinkList.Count; i++)
         {
-            List<GetNodeInfos> tempActive = new(_activePath);
-            tempActive.Add(minLinkList[i]);
+            List<GetNodeInfos> tempActive = new(_activePath)
+            {
+                minLinkList[i]
+            };
             _closedPaths.Add(tempActive);
         }
 
@@ -181,24 +121,5 @@ public class AstarPattern : MonoBehaviour
         _currentNode = _activePath[^1];
 
         return minLinkList;
-    }
-
-    // Valeurs calculées de chaque node.
-    public float GetH(GetNodeInfos node)
-    {
-        node.H = (_finalNode.transform.position - node.transform.position).magnitude;
-        return node.H;
-    }
-
-    public float GetG(GetNodeInfos node)
-    {
-        node.G = (_activePath.Count + 1);
-        return node.G;
-    }
-
-    public float GetF(GetNodeInfos node)
-    {
-        node.F = GetH(node) + GetG(node);
-        return node.F;
     }
 }
