@@ -12,7 +12,6 @@ public class BombPlacement : MonoBehaviour
     private GetUsedNode _iaPlacement;
 
     private readonly List<GameObject> _allNodesGo = new();
-    private readonly List<Vector3> _bombPositions = new();
     private Vector3 _placement;
 
     private void Awake()
@@ -25,11 +24,6 @@ public class BombPlacement : MonoBehaviour
 
     private void Start()
     {
-        foreach (var obj in ObjectPool.Instance.ActivatedObjects)
-        {
-            _bombPositions.Add(obj.transform.position);
-        }
-
         for (int i = 0; i < ObjectPool.Instance.AmountToPool; i++)
         {
             var bomb = ObjectPool.Instance.GetPooledObject();
@@ -44,14 +38,11 @@ public class BombPlacement : MonoBehaviour
 
         if (_allNodesGo[choice] != null && _allNodesGo[choice] != _iaPlacement.UsedNode && _allNodesGo[choice] != _playerPlacement.UsedNode)
         {
-            if (_bombPositions.Contains(_allNodesGo[choice].transform.position))
-            {
-                return RandomPlacement();
-            }
+            _placement = _allNodesGo[choice].transform.position;
 
-            else
+            foreach (var bnb in ObjectPool.Instance.ActivatedObjects) 
             {
-                _placement = _allNodesGo[choice].transform.position;
+                if(bnb.transform.position == _placement) return RandomPlacement();
             }
         }
 

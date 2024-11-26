@@ -26,7 +26,7 @@ public class MoveIA : MonoBehaviour
             var velocity = direction.normalized * Time.fixedDeltaTime;
             var distance = direction.magnitude;
 
-            while (distance >= 0.1f)
+            while (Mathf.Abs(distance) >= 0.1f)
             {
                 _rb.velocity = velocity * _speed;
                 distance = (node.transform.position - this.transform.position).magnitude;

@@ -24,6 +24,8 @@ public class AstarPattern : MonoBehaviour
     private MoveIA _moveIA;
     private NodeDistance _nodeDistance;
 
+    private Coroutine _coroutine;
+
     private void Awake()
     {
         _currentNode = _firstNode;
@@ -44,19 +46,10 @@ public class AstarPattern : MonoBehaviour
     {
         if (PathFinished)
         {
-            _currentNode = _usedNode.UsedNode;
-
-            if (Inventory._inventoryUI.FindAll((g) => g.activeInHierarchy).Count == 0 && !FirstNodeGoten)
+            if (Inventory._inventoryUI.FindAll((g) => g.activeInHierarchy).Count > 0 && !FirstNodeGoten)
             {
-                if (!_chooseBomb.Bombs.Any((b) => b.activeInHierarchy == true && b.CompareTag("Bomb"))) return;
+                _currentNode = _usedNode.UsedNode;
 
-                FirstNodeGoten = true;
-                _finalNode = _chooseBomb.GetClosestBomb();
-                StartAstar();
-            }
-
-            else if(Inventory._inventoryUI.FindAll((g) => g.activeInHierarchy).Count > 0 && !FirstNodeGoten)
-            {
                 FirstNodeGoten = true;
                 _finalNode = _wallNode;
                 StartAstar();
@@ -64,10 +57,28 @@ public class AstarPattern : MonoBehaviour
 
             PathFinished = false;
         }
+
+        if (Inventory._inventoryUI.FindAll((g) => g.activeInHierarchy).Count == 0)
+        {
+            if (!_chooseBomb.Bombs.Any((b) => b.activeInHierarchy == true && b.CompareTag("Bomb"))) return;
+
+            var final = _chooseBomb.GetClosestBomb();
+
+            if (_finalNode != final)
+            {
+                _currentNode = _usedNode.UsedNode;
+                _finalNode = final;
+
+                StartAstar();
+            }
+        }
+
     }
 
     public void StartAstar()
     {
+        if (_coroutine != null) StopCoroutine(_coroutine); 
+
         _activePath.Clear();
         _closedPaths.Clear();
         _tempClosedPaths.Clear();
@@ -82,11 +93,9 @@ public class AstarPattern : MonoBehaviour
 
         if (_currentNode == _finalNode)
         {
-            _finalNode = null;
-            StartCoroutine(_moveIA.MoveToNode(_activePath));
+            _coroutine = StartCoroutine(_moveIA.MoveToNode(_activePath));
         }
     }
-
 
     public List<GetNodeInfos> GetClosestLink()
     {
@@ -114,6 +123,7 @@ public class AstarPattern : MonoBehaviour
             {
                 minLinkList[i]
             };
+
             _closedPaths.Add(tempActive);
         }
 

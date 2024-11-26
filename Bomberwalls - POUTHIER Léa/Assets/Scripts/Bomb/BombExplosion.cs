@@ -32,9 +32,10 @@ public class BombExplosion : MonoBehaviour
         Collider2D[] ray = Physics2D.OverlapCircleAll(bomb.transform.position, 1.28f);
 
         ObjectPool.Instance.AddPoolObjectBack(bomb);
-        bomb = ObjectPool.Instance.GetPooledObject();
 
         _bombPlacement.PlacementReset(bomb);
+        bomb = ObjectPool.Instance.GetPooledObject();
+
         bomb.tag = "Bomb";
 
         foreach (Collider2D collider in ray)
