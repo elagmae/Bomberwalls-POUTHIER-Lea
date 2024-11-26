@@ -8,12 +8,10 @@ public class PlayerInputHandler : MonoBehaviour
     public event Action<InputAction.CallbackContext, Vector2> OnMove;
     public event Action<InputAction.CallbackContext> OnBombActivation;
 
-    private PlayerInput _player;
-
     private void Awake()
     {
-        _player = GetComponent<PlayerInput>();
-        _player.onActionTriggered += OnInput;
+        var player = GetComponent<PlayerInput>();
+        player.onActionTriggered += OnInput;
     }
 
     // Fonction reliant les events aux méthodes directement par les inputs.

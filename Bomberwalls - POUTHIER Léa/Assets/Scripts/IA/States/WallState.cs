@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-public class WallState : StatesBase
+﻿public class WallState : StatesBase
 {
     private GetUsedNode _usedNode;
     private StateMachine _machine;

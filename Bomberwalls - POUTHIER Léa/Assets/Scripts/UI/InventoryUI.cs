@@ -6,13 +6,12 @@ public class InventoryUI : MonoBehaviour
 {
     [field : SerializeField]
     public List<GameObject> _inventoryUI {get;private set;}
-    private BombCollection _bombCollection;
 
     private void Awake()
     {
-        _bombCollection = GetComponent<BombCollection>();
-        _bombCollection.OnBombCollect += InventoryAddUI;
-        _bombCollection.OnBombPlacement += InventoryRemoveUI;
+        var bombCollection = GetComponent<BombCollection>();
+        bombCollection.OnBombCollect += InventoryAddUI;
+        bombCollection.OnBombPlacement += InventoryRemoveUI;
     }
 
     public void InventoryAddUI(List<GameObject> inventory)

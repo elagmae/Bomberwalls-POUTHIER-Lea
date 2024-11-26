@@ -27,8 +27,8 @@ public class WallDestructIA : MonoBehaviour
     {
         yield return new WaitForSeconds(0.25f);
 
-        print("AOEIUGHBAOIEUHG");
-        for(int i = 1; i < _astar.Inventory._inventoryUI.Count((g) => g.activeInHierarchy); i++) {
+        for(int i = 1; i < _astar.Inventory._inventoryUI.Count((g) => g.activeInHierarchy); i++)
+        {
             StartCoroutine(_explosion.Detonation(ObjectPool.Instance.GetPooledObject()));
         }
 

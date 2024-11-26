@@ -6,18 +6,15 @@ public class PlayerMove : MonoBehaviour
     [SerializeField]
     private float _speed;
 
-    private PlayerInputHandler _input;
     private Vector2 _direction;
     private Rigidbody2D _rb;
-
-    private bool _verticalMoving;
 
     private void Awake()
     {
         _rb = GetComponent<Rigidbody2D>();
 
-        _input = GetComponent<PlayerInputHandler>();
-        _input.OnMove += Move;
+        var input = GetComponent<PlayerInputHandler>();
+        input.OnMove += Move;
     }
 
     private void FixedUpdate()
@@ -29,9 +26,9 @@ public class PlayerMove : MonoBehaviour
     public void Move(InputAction.CallbackContext ctx, Vector2 dir)
     {
         // Vérifie la valeur des inputs de déplacement du joueur pour que celui-ci ne puisse pas se déplacer en diagonnal.
-        _verticalMoving = dir.y != 0;
+        var verticalMoving = dir.y != 0;
 
-        if (_verticalMoving)
+        if (verticalMoving)
         {
             dir.x = 0;
         }
