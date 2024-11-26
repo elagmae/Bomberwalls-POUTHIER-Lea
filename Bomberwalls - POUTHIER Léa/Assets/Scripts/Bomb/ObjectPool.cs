@@ -39,11 +39,8 @@ public class ObjectPool : MonoBehaviour
     //Récupère un objet de la pool.
     public GameObject GetPooledObject()
     {
-        print($"{PooledObjects.Count}");
         for (int i = 0; i < PooledObjects.Count; i++)
         {
-            print($"{i}");
-            print($"{PooledObjects[i].name}");
             if (!PooledObjects[i].activeInHierarchy)
             {
                 var obj = PooledObjects[i];

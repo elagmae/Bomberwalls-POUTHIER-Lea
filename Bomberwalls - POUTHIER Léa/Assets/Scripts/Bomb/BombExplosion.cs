@@ -1,10 +1,13 @@
 using System;
 using System.Collections;
 using UnityEngine;
+using Cinemachine;
 
 public class BombExplosion : MonoBehaviour
 {
     public event Action<string> OnWallTouched;
+    [SerializeField]
+    private CinemachineImpulseSource _source;
     private BombCollection _collection;
     private BombPlacement _bombPlacement;
 
@@ -37,6 +40,7 @@ public class BombExplosion : MonoBehaviour
         bomb = ObjectPool.Instance.GetPooledObject();
 
         bomb.tag = "Bomb";
+        _source.GenerateImpulse();
 
         foreach (Collider2D collider in ray)
         {

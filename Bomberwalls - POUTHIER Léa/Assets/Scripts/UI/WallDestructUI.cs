@@ -1,4 +1,5 @@
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,11 +11,17 @@ public class WallDestructUI : MonoBehaviour
     private GameObject _goSliderPV;
     [SerializeField]
     private TextMeshProUGUI _numberPV;
+    [SerializeField]
+    private GameObject _endPanel;
+    [SerializeField]
+    private TextMeshProUGUI _winnerUI;
+    private Color _color;
 
     private Slider _sliderPV;
 
     private void Awake()
     {
+        _color = GetComponent<SpriteRenderer>().color;
         _sliderPV = _goSliderPV.GetComponent<Slider>();
         _bombExplosion.OnWallTouched += RemoveWallPV;
     }
@@ -29,8 +36,27 @@ public class WallDestructUI : MonoBehaviour
             if(_sliderPV.value == 0)
             {
                 Destroy(this.gameObject);
-                Debug.Log("end game");
+                EndGame();
             }
         }
+    }
+
+    public void EndGame()
+    {
+        string playerColor;
+        _endPanel.SetActive(true);
+        Time.timeScale = 0;
+
+        if (this.gameObject.name.EndsWith("R"))
+        {
+            playerColor = "Rouge";
+        }
+
+        else
+        {
+            playerColor = "Bleu";
+        }
+
+        _winnerUI.text = "Le <color=#" + _color.ToHexString() + "> Joueur " + playerColor +" </color> a gagné !";
     }
 }
