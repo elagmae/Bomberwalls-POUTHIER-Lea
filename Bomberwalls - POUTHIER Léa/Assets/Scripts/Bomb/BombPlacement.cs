@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public class BombPlacement : MonoBehaviour
@@ -12,7 +13,6 @@ public class BombPlacement : MonoBehaviour
     private GetUsedNode _iaPlacement;
 
     private readonly List<GameObject> _allNodesGo = new();
-    private Vector3 _placement;
 
     private void Awake()
     {
@@ -36,17 +36,19 @@ public class BombPlacement : MonoBehaviour
     {
         var choice = Random.Range(0, _allNodesGo.Count);
 
+        Vector3 placement = Vector3.zero;
+
         if (_allNodesGo[choice] != null && _allNodesGo[choice] != _iaPlacement.UsedNode && _allNodesGo[choice] != _playerPlacement.UsedNode)
         {
-            _placement = _allNodesGo[choice].transform.position;
+            placement = _allNodesGo[choice].transform.position;
 
             foreach (var bnb in ObjectPool.Instance.ActivatedObjects) 
             {
-                if(bnb.transform.position == _placement) return RandomPlacement();
+                if(bnb.transform.position == placement) return RandomPlacement();
             }
         }
 
-        return _placement;
+        return placement;
     }
 
     // Permet à une bombe de réactualiser sa position, en utilisant la fonction de placement aléatoire.

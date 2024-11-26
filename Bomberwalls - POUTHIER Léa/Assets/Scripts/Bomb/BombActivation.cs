@@ -1,17 +1,15 @@
-using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class BombActivation : MonoBehaviour
 {
-    private PlayerInputHandler _input;
     private BombCollection _bombCollection;
     private BombExplosion _bombExplosion;
 
     private void Start()
     {
-        _input = GetComponent<PlayerInputHandler>();
-        _input.OnBombActivation += Activate;
+        var input = GetComponent<PlayerInputHandler>();
+        input.OnBombActivation += Activate;
 
         _bombCollection = GetComponent<BombCollection>();
         _bombExplosion = GetComponent<BombExplosion>();

@@ -36,8 +36,6 @@ public class MoveIA : MonoBehaviour
             }
         }
 
-        _astar.PathFinished = true;
-        _astar.FirstNodeGoten = false;
         _rb.velocity = Vector2.zero;
     }
 }

@@ -13,7 +13,6 @@ public class WallState : StatesBase
 
     public override void OnStateEnter()
     {
-        Debug.Log("OnStateEnter -> WallState");
         _machine.Astar.StartAstar(_usedNode.UsedNode, _machine.Astar.WallNode);
     }
 
@@ -23,7 +22,6 @@ public class WallState : StatesBase
 
     public override void OnUpdate()
     {
-        Debug.Log("OnUpdate -> WallState");
         if (_machine.Astar.Inventory._inventoryUI.FindAll((g) => g.activeInHierarchy).Count == 0)
         {
             _machine.TransitionTo(StateMachine.States.GoToBomb);

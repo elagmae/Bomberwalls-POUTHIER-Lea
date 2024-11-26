@@ -18,7 +18,6 @@ public class BombState : StatesBase
 
     public override void OnStateEnter()
     {
-        Debug.Log("OnStateEnter -> BombState");
         _lastNodes = null;
     }
 
@@ -28,14 +27,13 @@ public class BombState : StatesBase
 
     public override void OnUpdate()
     {
-        Debug.Log("OnUpdate -> BombState");
         if (_machine.Astar.Inventory._inventoryUI.FindAll((g) => g.activeInHierarchy).Count > 0)
         {
             _machine.TransitionTo(StateMachine.States.GoToWall);
             return;
         }
 
-        if (!_chooseBomb.Bombs.Any((b) => b.activeInHierarchy == true && b.CompareTag("Bomb"))) return;
+        if (_chooseBomb.Bombs.All((b) => (!b.activeInHierarchy) || (b.activeInHierarchy && !b.CompareTag("Bomb")))) return;
 
         var final = _chooseBomb.GetClosestBomb();
 

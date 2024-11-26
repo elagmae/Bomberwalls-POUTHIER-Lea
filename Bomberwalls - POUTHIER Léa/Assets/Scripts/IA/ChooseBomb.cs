@@ -5,7 +5,6 @@ public class ChooseBomb : MonoBehaviour
 {
     public List<GameObject> Bombs { get; private set; } = new();
     public GameObject MinObject { get; set; } = null;
-    public GameObject CurrentBomb { get; set; } = null;
 
     private BombPlacement _placement;
 
@@ -45,7 +44,6 @@ public class ChooseBomb : MonoBehaviour
             {
                 if (MinObject.transform.position == node.gameObject.transform.position)
                 {
-                    CurrentBomb = MinObject;
                     return node;
                 }
             }

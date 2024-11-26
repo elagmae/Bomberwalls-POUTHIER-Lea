@@ -5,19 +5,13 @@ using UnityEngine.Serialization;
 
 public class AstarPattern : MonoBehaviour
 {
-    public bool PathFinished { get; set; } = true;
-    public bool FirstNodeGoten { get; set; } = false;
     public InventoryUI Inventory { get; private set; }
 
-    [SerializeField]
-    private GetNodeInfos _firstNode;
     [field: SerializeField, FormerlySerializedAs("_wallNode")]
     public GetNodeInfos WallNode { get; private set; }
 
     private readonly List<List<GetNodeInfos>> _closedPaths = new();
-    private readonly List<List<GetNodeInfos>> _tempClosedPaths = new();
     private readonly List<GetNodeInfos> _activePath = new();
-    private GetUsedNode _usedNode;
     private ChooseShortestPath _choosePath;
     private MoveIA _moveIA;
     private NodeDistance _nodeDistance;
@@ -26,7 +20,6 @@ public class AstarPattern : MonoBehaviour
 
     private void Awake()
     {
-        _usedNode = GetComponent<GetUsedNode>();
         Inventory = GetComponent<InventoryUI>();
         _nodeDistance = GetComponent<NodeDistance>();
         _choosePath = GetComponent<ChooseShortestPath>();
@@ -39,7 +32,6 @@ public class AstarPattern : MonoBehaviour
 
         _activePath.Clear();
         _closedPaths.Clear();
-        _tempClosedPaths.Clear();
 
         _activePath.Add(current);
 

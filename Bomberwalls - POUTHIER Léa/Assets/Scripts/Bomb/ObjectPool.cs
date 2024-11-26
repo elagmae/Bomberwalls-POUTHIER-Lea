@@ -22,16 +22,12 @@ public class ObjectPool : MonoBehaviour
             return;
         }
 
-        else
-        {
-            Instance = this;
-        }
-
-        GameObject temp;
+        Instance = this;
+        
 
         for (int i = 0; i < AmountToPool; i++)
         {
-            temp = Instantiate(_objectToPool);
+            GameObject temp = Instantiate(_objectToPool);
             temp.transform.rotation = _objectToPool.transform.rotation;
             temp.SetActive(false);
 
@@ -43,8 +39,11 @@ public class ObjectPool : MonoBehaviour
     //Récupère un objet de la pool.
     public GameObject GetPooledObject()
     {
-        for (int i = 0; i < AmountToPool; i++)
+        print($"{PooledObjects.Count}");
+        for (int i = 0; i < PooledObjects.Count; i++)
         {
+            print($"{i}");
+            print($"{PooledObjects[i].name}");
             if (!PooledObjects[i].activeInHierarchy)
             {
                 var obj = PooledObjects[i];
